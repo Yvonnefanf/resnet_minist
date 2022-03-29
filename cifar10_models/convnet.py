@@ -24,6 +24,7 @@ class CNN(nn.Module):
         )
         # fully connected layer, output 10 classes
         self.out = nn.Linear(32 * 7 * 7, 10)
+
     def forward(self, x):
         x = self.conv1(x)
         x = self.conv2(x)

@@ -1,13 +1,14 @@
 import os
+import json
 
 import pytorch_lightning as pl
-import requests
 from torch.utils.data import DataLoader
-from torchvision import transforms as T
 from torchvision.datasets import MNIST
-from torchvision.transforms import ToTensor
-from tqdm import tqdm
+from dataset import DataHandler
+import torchvision.transforms as transforms
+from torchvision.transforms import ToTensor, CenterCrop, RandomCrop
 import torch
+import numpy as np
 
 
 
@@ -43,22 +44,29 @@ class MNISTData(pl.LightningDataModule):
         return self.val_dataloader()
 
     def save_train_data(self, trainloader, path):
+        # TODO follow this, modify transform(contain only totensor) to get sprite image, the order should be preserved
         trainset_data = None
         trainset_label = None
-        for batch_idx, (inputs, targets) in enumerate(trainloader):
+        all_idxs = None
+
+        for batch_idx, (inputs,targets) in enumerate(trainloader):
             if trainset_data != None:
                 # print(input_list.shape, inputs.shape)
                 trainset_data = torch.cat((trainset_data, inputs), 0)
                 trainset_label = torch.cat((trainset_label, targets), 0)
+                # all_idxs = torch.cat((all_idxs, idxs), 0)
             else:
                 trainset_data = inputs
                 trainset_label = targets
-
+                # all_idxs = idxs
+        
         training_path = os.path.join(path, "Training_data")
         if not os.path.exists(training_path):
             os.mkdir(training_path)
         torch.save(trainset_data, os.path.join(training_path, "training_dataset_data.pth"))
         torch.save(trainset_label, os.path.join(training_path, "training_dataset_label.pth"))
+        torch.save(all_idxs, os.path.join(training_path, "training_dataset_idxs.pth"))
+
 
     def save_test_data(self, testloader, path):
 
@@ -78,3 +86,6 @@ class MNISTData(pl.LightningDataModule):
             os.mkdir(testing_path)
         torch.save(testset_data, os.path.join(testing_path, "testing_dataset_data.pth"))
         torch.save(testset_label, os.path.join(testing_path, "testing_dataset_label.pth"))
+        idxs = [i for i in range(len(testset_label))]
+        torch.save(torch.Tensor(idxs), os.path.join(testing_path, "testing_dataset_idxs.pth"))
+

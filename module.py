@@ -8,6 +8,8 @@ from cifar10_models.inception import inception_v3
 from cifar10_models.mobilenetv2 import mobilenet_v2
 from cifar10_models.resnet import resnet18, resnet34, resnet50
 from cifar10_models.vgg import vgg11_bn, vgg13_bn, vgg16_bn, vgg19_bn
+from cifar10_models.mlp import mlp3
+from cifar10_models.convnet import convnet
 from schduler import WarmupCosineLR
 from torch import nn
 from pytorch_lightning.core.decorators import auto_move_data
@@ -26,6 +28,8 @@ all_classifiers = {
     "mobilenet_v2": mobilenet_v2(),
     "googlenet": googlenet(),
     "inception_v3": inception_v3(),
+    "mlp":mlp3(),
+    "convnet":convnet()
 }
 
 
@@ -38,7 +42,8 @@ class MNISTModule(pl.LightningModule):
         self.accuracy = Accuracy()
 
         self.model = all_classifiers[self.hparams.classifier]
-        self.model.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        if self.hparams.classifier not in ["mlp", "convnet"]:
+            self.model.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
 
     def forward(self, batch):
         images, labels = batch
