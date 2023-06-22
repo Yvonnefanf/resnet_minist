@@ -6,7 +6,8 @@ from cifar10_models.densenet import densenet121, densenet161, densenet169
 from cifar10_models.googlenet import googlenet
 from cifar10_models.inception import inception_v3
 from cifar10_models.mobilenetv2 import mobilenet_v2
-from cifar10_models.resnet import resnet18, resnet34, resnet50
+from cifar10_models.resnet import resnet18, resnet34, resnet50, resnet18_withdropout
+
 from cifar10_models.vgg import vgg11_bn, vgg13_bn, vgg16_bn, vgg19_bn
 from cifar10_models.mlp import mlp3
 from cifar10_models.convnet import convnet
@@ -22,6 +23,7 @@ all_classifiers = {
     "resnet18": resnet18(),
     "resnet34": resnet34(),
     "resnet50": resnet50(),
+    "resnet18_withdropout": resnet18_withdropout(),
     "densenet121": densenet121(),
     "densenet161": densenet161(),
     "densenet169": densenet169(),
@@ -42,6 +44,7 @@ class MNISTModule(pl.LightningModule):
         self.accuracy = Accuracy()
 
         self.model = all_classifiers[self.hparams.classifier]
+        print("self.hparams.classifier",self.hparams.classifier)
         if self.hparams.classifier not in ["mlp", "convnet"]:
             self.model.conv1 = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
 

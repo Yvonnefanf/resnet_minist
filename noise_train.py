@@ -13,7 +13,7 @@ from module import MNISTModule
 
 
 def main(args):
-    content_path = os.path.join(args.filepath, args.noise_type, "mnist", str(int(args.noise_rate*100)))
+    content_path = os.path.join(args.filepath,"01")
     os.makedirs(content_path, exist_ok=True)
 
     seed_everything(0)
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     )
 
     # TRAINER args
-    parser.add_argument("--classifier", type=str, default="resnet18")
+    parser.add_argument("--classifier", type=str, default="resnet18_withdropout")
     parser.add_argument("--pretrained", type=int, default=0, choices=[0, 1])
 
     parser.add_argument("--precision", type=int, default=32, choices=[16, 32])
@@ -76,12 +76,12 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", type=float, default=5e-3)
     parser.add_argument("--weight_decay", type=float, default=1e-2)
 
-    parser.add_argument("--filepath", type=str, default="/home/xianglin/projects/DVI_data/noisy")
+    parser.add_argument("--filepath", type=str, default="/home/yifan/0ExpMinist/Dropout/0.3")
     parser.add_argument("--period", type=int, default=1)
     parser.add_argument("--save_top_k", type=int, default=-1)
 
     parser.add_argument("--noise_type", type=str, choices=["symmetric", "pairflip"], default="symmetric")
-    parser.add_argument("--noise_rate", type=float, default=0.1)
+    parser.add_argument("--noise_rate", type=float, default=0.0)
 
     args = parser.parse_args()
 

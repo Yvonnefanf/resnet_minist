@@ -68,7 +68,7 @@ if __name__ == "__main__":
     parser.add_argument("--num_workers", type=int, default=2)
     parser.add_argument("--gpu_id", type=str, default="0")
 
-    parser.add_argument("--learning_rate", type=float, default=5e-3)
+    parser.add_argument("--learning_rate", type=float, default=1e-2)
     parser.add_argument("--weight_decay", type=float, default=1e-2)
     parser.add_argument("--filepath", type=str, default="models")
     parser.add_argument("--period", type=int, default=1)

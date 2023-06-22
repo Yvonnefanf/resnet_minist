@@ -7,7 +7,10 @@ __all__ = [
     "resnet18",
     "resnet34",
     "resnet50",
+    "resnet18_withdropout"
 ]
+
+dropout_rate = 0.3
 
 
 def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):
@@ -135,6 +138,7 @@ class ResNet(nn.Module):
         self,
         block,
         layers,
+        with_dropout=False,
         num_classes=10,
         zero_init_residual=False,
         groups=1,
@@ -160,11 +164,14 @@ class ResNet(nn.Module):
             )
         self.groups = groups
         self.base_width = width_per_group
+        self.with_dropout = with_dropout
 
         # CIFAR10: kernel_size 7 -> 3, stride 2 -> 1, padding 3->1
-        self.conv1 = nn.Conv2d(
-            3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False
-        )
+         # self.conv1 = nn.Conv2d(
+        #     3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False
+        # )
+        # mnist 3->1, kernel_size
+        self.conv1 = nn.Conv2d(1, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False)
         # END
 
         self.bn1 = norm_layer(self.inplanes)
@@ -182,6 +189,9 @@ class ResNet(nn.Module):
         )
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(512 * block.expansion, num_classes)
+        if self.with_dropout:
+            self.fc = nn.Sequential(nn.Dropout(dropout_rate),nn.Linear(512 * block.expansion, num_classes))
+            # self.fc = nn.Sequential(nn.Flatten(),nn.Dropout(dropout_rate),nn.Linear(512 * block.expansion, num_classes))
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -292,7 +302,18 @@ def resnet18(pretrained=False, progress=True, device="cpu", **kwargs):
         progress (bool): If True, displays a progress bar of the download to stderr
     """
     return _resnet(
-        "resnet18", BasicBlock, [2, 2, 2, 2], pretrained, progress, device, **kwargs
+        "resnet18", BasicBlock, [2, 2, 2, 2], pretrained, progress, device,with_dropout = False, **kwargs
+    )
+
+
+def resnet18_withdropout(pretrained=False, progress=True, device="cpu", **kwargs):
+    """Constructs a ResNet-18 model.
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    return _resnet(
+        "resnet18", BasicBlock, [2, 2, 2, 2], pretrained, progress, device, with_dropout = True, **kwargs
     )
 
 
